@@ -596,13 +596,13 @@ function ThemeManager:UpdateContrastWarning()
     end
 
     if Report.Passes then
-        ContrastLabel:SetText(string.format("Contrast check: good (%.1f:1)", Report.Ratio))
+        ContrastLabel:SetText(string.format("对比度检查：良好（%.1f:1）", Report.Ratio))
 
         TextLabel.TextColor3 = Library.Scheme.FontColor
         Library.Registry[TextLabel].TextColor3 = "FontColor"
     else
         ContrastLabel:SetText(string.format(
-            "Low contrast (%.1f:1) between %s. Aim for at least %.1f:1 so text stays readable.",
+            "%s 的对比度太低 (%.1f:1)。目标至少达到 %.1f:1，以确保文字可读。",
             Report.Ratio, Report.PairName, ContrastWarnThreshold
         ))
 
@@ -611,9 +611,9 @@ function ThemeManager:UpdateContrastWarning()
 
         if not ThemeManager.ContrastWasPoor then
             Library:Notify({
-                Title = "Low contrast theme",
+                Title = "低对比度主题",
                 Description = string.format(
-                    "Your %s has a contrast ratio of %.1f:1, below the recommended %.1f:1. Text may be hard to read.",
+                    "你的 %s 对比度为 %.1f:1，低于推荐的 %.1f:1。文字可能难以阅读。",
                     Report.PairName, Report.Ratio, ContrastWarnThreshold
                 ),
                 Time = 10,
@@ -787,7 +787,7 @@ function ThemeManager:CreateThemeManager(Themesbox: any)
     local function RefreshDefaultThemeLabel()
         local DefaultThemeName, _Success, _ErrorMessage = ThemeManager:GetDefaultTheme()
 
-        DefaultThemeLabel:SetText(string.format("Current default theme: %s", DefaultThemeName))
+        DefaultThemeLabel:SetText(string.format("当前默认主题：%s", DefaultThemeName))
         if CustomThemeList then RefreshList() end
     end
 
