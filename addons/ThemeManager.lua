@@ -1071,7 +1071,7 @@ function ThemeManager:CreateThemeManager(Themesbox: any)
         Text = "主题 JSON"
     })
 
-    Themesbox:AddButton("Import theme", function()
+    Themesbox:AddButton("导入主题", function()
         local ThemeJSON = ThemeJSONInput.Value
         if IsStringEmpty(ThemeJSON) then
             ThemeManager.Library:Notify("主题 JSON 不能为空")
