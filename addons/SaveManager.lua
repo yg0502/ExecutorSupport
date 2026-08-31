@@ -1054,7 +1054,7 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
         )
     end)
 
-    ConfigurationBox:AddButton("导出配置", function()
+    ConfigurationBox:AddButton("导出当前配置", function()
         local EncodedData, Success, ErrorMessage = SaveManager:SaveJSON()
         if not Success  then
             SaveManager.Library:Notify(ErrorMessage)
