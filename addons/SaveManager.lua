@@ -693,7 +693,7 @@ function SaveManager:LoadAutoloadConfig()
     local ConfigName, Success, FetchErrorMessage = SaveManager:GetAutoloadConfig()
     if not Success or FetchErrorMessage then
         if FetchErrorMessage ~= "Autoload config is not set" then
-            SaveManager.Library:Notify(string.format("Failed to load autoload config: %s", FetchErrorMessage))
+            SaveManager.Library:Notify(string.format("自动加载配置失败：%s", FetchErrorMessage))
         end
 
         return
@@ -701,11 +701,11 @@ function SaveManager:LoadAutoloadConfig()
 
     local SuccessLoad, LoadErrorMessage = SaveManager:Load(ConfigName)
     if not SuccessLoad then
-        SaveManager.Library:Notify(string.format("Failed to load autoload config: %s", LoadErrorMessage))
+        SaveManager.Library:Notify(string.format("自动加载配置失败：%s", LoadErrorMessage))
         return
     end
 
-    SaveManager.Library:Notify(string.format("Successfully loaded autoload config %q", ConfigName))
+    SaveManager.Library:Notify(string.format("自动加载配置成功：%q", ConfigName))
 end
 
 function SaveManager:DeleteAutoLoadConfig(): (boolean, string?)
@@ -751,7 +751,7 @@ local function ShowDialog(
 
         FooterButtons = {
             Cancel = {
-                Title = "Cancel",
+                Title = "取消",
                 Variant = "Ghost",
                 Order = 1,
                 Callback = function(Dialog)
@@ -776,7 +776,7 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
     assert(SaveManager.Library, "Library is not set, call SaveManager:SetLibrary(Library) first.")
     local ConfigurationBox = Tab:AddGroupbox({
         Side = "Right",
-        Name = "Configuration",
+        Name = "配置文件",
         IconName = IconName or "folder-cog",
     })
 
@@ -789,24 +789,24 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
     local function RefreshAutoloadConfigLabel()
         local AutoloadConfigName, _Success, _ErrorMessage = SaveManager:GetAutoloadConfig()
 
-        AutoloadConfigLabel:SetText(string.format("Current autoload config: %s", AutoloadConfigName))
+        AutoloadConfigLabel:SetText(string.format("当前自动加载配置：%s", AutoloadConfigName))
         if ConfigList then RefreshList() end
     end
 
     --// Create
     ConfigurationBox:AddInput("SaveManager_ConfigName", {
-        Text = "Config name"
+        Text = "配置名称"
     })
 
-    ConfigurationBox:AddButton("Create config", function()
+    ConfigurationBox:AddButton("创建配置", function()
         local ConfigName = ConfigNameInput.Value
         if IsStringEmpty(ConfigName) then
-            SaveManager.Library:Notify("Configuration name cannot be empty.")
+            SaveManager.Library:Notify("配置名称不能为空")
             return
         end
 
         if string.lower(ConfigName) == "autoload" then
-            SaveManager.Library:Notify("Invalid config name provided.")
+            SaveManager.Library:Notify("配置名称无效")
             return
         end
         
@@ -816,18 +816,18 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
             end,
 
             "SaveManager_CreateConfig",
-            "Config already exists",
-            string.format("A config named %q already exists. Overwriting will replace it with your current settings.", ConfigName),
+            "配置文件已经存在",
+            string.format("名称为 %q 的配置文件已经存在。继续覆盖将会使用你当前的配置设置进行替换。", ConfigName),
 
-            "Overwrite",
+            "覆盖",
             function()
                 local Success, ErrorMessage = SaveManager:Save(ConfigName)
                 if not Success then
-                    SaveManager.Library:Notify(string.format("Failed to create config %q: %s", ConfigName, ErrorMessage))
+                    SaveManager.Library:Notify(string.format("创建配置 %q 失败：%s", ConfigName, ErrorMessage))
                     return
                 end
 
-                SaveManager.Library:Notify(string.format("Successfully created config %q", ConfigName))
+                SaveManager.Library:Notify(string.format("成功创建配置 %q", ConfigName))
                 RefreshList()
             end
         )
@@ -837,7 +837,7 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
 
     --// Manage
     ConfigurationBox:AddDropdown("SaveManager_ConfigList", {
-        Text = "Config list",
+        Text = "配置文件列表",
 
         Values = SaveManager:RefreshConfigList(),
         AllowNull = true,
@@ -845,14 +845,14 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
 
         FormatDisplayValue = function(Value: any)
             if Value == SaveManager.AutoloadConfig then
-                return string.format("%s (autoload)", Value)
+                return string.format("%s（自动加载）", Value)
             end
 
             return Value
         end,
         FormatListValue = function(Value: any)
             if Value == SaveManager.AutoloadConfig then
-                return string.format("%s (autoload)", Value)
+                return string.format("%s（自动加载）", Value)
             end
 
             return Value
@@ -860,13 +860,13 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
     })
 
     ConfigurationBox:AddButton({
-        Text = "Load config",
+        Text = "加载配置",
         DoubleClick = false,
 
         Func = function()
             local ConfigName = ConfigList.Value
             if IsStringEmpty(ConfigName) then
-                SaveManager.Library:Notify("Please select a config first.")
+                SaveManager.Library:Notify("请先选择一个配置文件")
                 return
             end
 
@@ -876,31 +876,31 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
                 end,
 
                 "SaveManager_LoadConfig",
-                "Load config",
-                string.format("Are you sure you want to load %q? Your current settings will be overwritten.", ConfigName),
+                "加载配置",
+                string.format("你确定要加载 %q 吗？你当前的所有设置将会被覆盖。", ConfigName),
 
-                "Load",
+                "加载",
                 function()
                     local Success, ErrorMessage = SaveManager:Load(ConfigName)
                     if not Success then
-                        SaveManager.Library:Notify(string.format("Failed to load config %q: %s", ConfigName, ErrorMessage))
+                        SaveManager.Library:Notify(string.format("加载配置 %q 失败：%s", ConfigName, ErrorMessage))
                         return
                     end
 
-                    SaveManager.Library:Notify(string.format("Successfully loaded config %q", ConfigName))
+                    SaveManager.Library:Notify(string.format("成功加载配置 %q", ConfigName))
                 end
             )
         end
     })
     
     ConfigurationBox:AddButton({
-        Text = "Overwrite config",
+        Text = "覆盖配置",
         DoubleClick = false,
 
         Func = function()
             local ConfigName = ConfigList.Value
             if IsStringEmpty(ConfigName) then
-                SaveManager.Library:Notify("Please select a config first.")
+                SaveManager.Library:Notify("请先选择一个配置文件")
                 return
             end
 
@@ -910,31 +910,31 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
                 end,
 
                 "SaveManager_OverwriteConfig",
-                "Overwrite config",
-                string.format("Are you sure you want to overwrite %q with your current settings? This cannot be undone.", ConfigName),
+                "覆盖配置",
+                string.format("你确定要用你当前的设置覆盖 %q 吗？此操作无法撤销。", ConfigName),
 
-                "Overwrite",
+                "覆盖",
                 function()
                     local Success, ErrorMessage = SaveManager:Save(ConfigName)
                     if not Success then
-                        SaveManager.Library:Notify(string.format("Failed to overwrite config %q: %s", ConfigName, ErrorMessage))
+                        SaveManager.Library:Notify(string.format("覆盖配置 %q 失败：%s", ConfigName, ErrorMessage))
                         return
                     end
 
-                    SaveManager.Library:Notify(string.format("Successfully overwrote config %q", ConfigName))
+                    SaveManager.Library:Notify(string.format("成功覆盖配置 %q", ConfigName))
                 end
             )
         end
     })
 
     ConfigurationBox:AddButton({
-        Text = "Delete config",
+        Text = "删除配置",
         DoubleClick = false,
 
         Func = function()
             local ConfigName = ConfigList.Value
             if IsStringEmpty(ConfigName) then
-                SaveManager.Library:Notify("Please select a config first.")
+                SaveManager.Library:Notify("请先选择一个配置文件")
                 return
             end
 
@@ -944,51 +944,51 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
                 end,
 
                 "SaveManager_DeleteConfig",
-                "Delete config",
-                string.format("Are you sure you want to delete %q? This cannot be undone.", ConfigName),
+                "删除配置",
+                string.format("你确定要删除 %q 吗？此操作无法撤销。", ConfigName),
                 
-                "Delete",
+                "删除",
                 function()
                     local Success, ErrorMessage = SaveManager:Delete(ConfigName)
                     if not Success then
-                        SaveManager.Library:Notify(string.format("Failed to delete config %q: %s", ConfigName, ErrorMessage))
+                        SaveManager.Library:Notify(string.format("删除配置 %q 失败：%s", ConfigName, ErrorMessage))
                         return
                     end
 
-                    SaveManager.Library:Notify(string.format("Successfully deleted config %q", ConfigName))
+                    SaveManager.Library:Notify(string.format("成功删除配置 %q", ConfigName))
                     RefreshAutoloadConfigLabel()
                 end
             )
         end
     })
 
-    ConfigurationBox:AddButton("Refresh list", RefreshList)
+    ConfigurationBox:AddButton("刷新配置列表", RefreshList)
 
     --// Autoload Config
     ConfigurationBox:AddButton({
-        Text = "Set as autoload",
+        Text = "设置默认自动加载配置",
         DoubleClick = false,
 
         Func = function()
             local ConfigName = ConfigList.Value
             if IsStringEmpty(ConfigName) then
-                SaveManager.Library:Notify("Please select a config first.")
+                SaveManager.Library:Notify("请先选择一个配置文件")
                 return
             end
 
             local Success, ErrorMessage = SaveManager:SaveAutoloadConfig(ConfigName)
             if not Success then
-                SaveManager.Library:Notify(string.format("Failed to set autoload config %q: %s", ConfigName, ErrorMessage))
+                SaveManager.Library:Notify(string.format("设置为默认自动加载配置文件 %q 失败：%s", ConfigName, ErrorMessage))
                 return
             end
 
-            SaveManager.Library:Notify(string.format("Successfully set autoload config to %q", ConfigName))
+            SaveManager.Library:Notify(string.format("成功设置为默认自动加载配置文件 %q", ConfigName))
             RefreshAutoloadConfigLabel()
         end
     })
 
     ConfigurationBox:AddButton({
-        Text = "Reset autoload",
+        Text = "重置默认自动加载配置",
         DoubleClick = false,
 
         Func = function()
@@ -998,37 +998,37 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
                 end,
 
                 "SaveManager_ResetAutoload",
-                "Reset autoload config",
-                "Are you sure you want to clear the autoload config? No config will be loaded automatically on next launch.",
+                "重置默认自动加载配置文件",
+                "你确定要清除自动加载配置文件吗？下次启动时不会自动加载任何配置文件。",
                 
-                "Reset",
+                "重置",
                 function()
                     local Success, ErrorMessage = SaveManager:DeleteAutoLoadConfig()
                     if not Success then
-                        SaveManager.Library:Notify(string.format("Failed to reset autoload config: %s", ErrorMessage))
+                        SaveManager.Library:Notify(string.format("重置默认自动加载配置文件失败：%s", ErrorMessage))
                         return
                     end
 
-                    SaveManager.Library:Notify("Successfully reset autoload config.")
+                    SaveManager.Library:Notify("成功重置默认自动加载配置文件")
                     RefreshAutoloadConfigLabel()
                 end
             )
         end
     })
 
-    AutoloadConfigLabel = ConfigurationBox:AddLabel("Current autoload config: ...", true);
+    AutoloadConfigLabel = ConfigurationBox:AddLabel("当前自动加载配置：...", true);
 
     ConfigurationBox:AddDivider()
 
     --// Import & Export
     ConfigurationBox:AddInput("SaveManager_JSON", {
-        Text = "Config JSON"
+        Text = "配置文件 JSON"
     })
 
-    ConfigurationBox:AddButton("Import config", function()
+    ConfigurationBox:AddButton("导入配置", function()
         local ConfigJSON = ConfigJSONInput.Value
         if IsStringEmpty(ConfigJSON) then
-            SaveManager.Library:Notify("Configuration JSON cannot be empty")
+            SaveManager.Library:Notify("配置 JSON 不能为空")
             return
         end
 
@@ -1038,23 +1038,23 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
             end,
 
             "SaveManager_ImportConfig",
-            "Import config",
-            "Are you sure you want to import this configuration? Your current settings will be overwritten.",
+            "导入配置文件",
+            "你确定要导入这个配置吗？你当前的设置将会被覆盖。",
 
-            "Import",
+            "导入",
             function()
                 local Success, ErrorMessage = SaveManager:LoadJSON(ConfigJSON)
                 if not Success then
-                    SaveManager.Library:Notify(string.format("Failed to import config: %s", ErrorMessage))
+                    SaveManager.Library:Notify(string.format("导入配置失败：%s", ErrorMessage))
                     return
                 end
 
-                SaveManager.Library:Notify("Successfully imported config")
+                SaveManager.Library:Notify("成功导入配置文件")
             end
         )
     end)
 
-    ConfigurationBox:AddButton("Export current config", function()
+    ConfigurationBox:AddButton("导出配置", function()
         local EncodedData, Success, ErrorMessage = SaveManager:SaveJSON()
         if not Success  then
             SaveManager.Library:Notify(ErrorMessage)
@@ -1064,7 +1064,7 @@ function SaveManager:BuildConfigSection(Tab: any, IconName: string)
         ConfigJSONInput:SetValue(EncodedData)
         if setclipboard then
             setclipboard(EncodedData)
-            SaveManager.Library:Notify("Copied config to your clipboard")
+            SaveManager.Library:Notify("配置已复制到剪贴板")
         end
     end)
 
