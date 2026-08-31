@@ -596,13 +596,13 @@ function ThemeManager:UpdateContrastWarning()
     end
 
     if Report.Passes then
-        ContrastLabel:SetText(string.format("Contrast check: good (%.1f:1)", Report.Ratio))
+        ContrastLabel:SetText(string.format("对比度检查：良好（%.1f:1）", Report.Ratio))
 
         TextLabel.TextColor3 = Library.Scheme.FontColor
         Library.Registry[TextLabel].TextColor3 = "FontColor"
     else
         ContrastLabel:SetText(string.format(
-            "Low contrast (%.1f:1) between %s. Aim for at least %.1f:1 so text stays readable.",
+            "你的 %s 对比度太低（%.1f:1）。目标至少达到 %.1f:1，以确保文字可读。",
             Report.Ratio, Report.PairName, ContrastWarnThreshold
         ))
 
@@ -611,9 +611,9 @@ function ThemeManager:UpdateContrastWarning()
 
         if not ThemeManager.ContrastWasPoor then
             Library:Notify({
-                Title = "Low contrast theme",
+                Title = "低对比度主题",
                 Description = string.format(
-                    "Your %s has a contrast ratio of %.1f:1, below the recommended %.1f:1. Text may be hard to read.",
+                    "你的 %s 对比度为 %.1f:1，低于推荐的 %.1f:1。文字可能难以阅读。",
                     Report.PairName, Report.Ratio, ContrastWarnThreshold
                 ),
                 Time = 10,
@@ -643,7 +643,7 @@ end
 --// Split out of ApplyTheme so imported JSON can go through the same path as themes loaded from disk.
 function ThemeManager:ApplyThemeData(ThemeData: any): (boolean, string?)
     if typeof(ThemeData) ~= "table" then
-        return false, "Invalid theme data"
+        return false, "主题数据无效"
     end
 
     local Library = ThemeManager.Library
@@ -686,14 +686,14 @@ end
 
 function ThemeManager:ApplyTheme(ThemeName: string)
     if IsStringEmpty(ThemeName) then
-        return false, "No theme is selected"
+        return false, "未选择主题"
     end
 
     local CustomThemeData = ThemeManager:GetCustomTheme(ThemeName)
     local Data = CustomThemeData or ThemeManager.BuiltInThemes[ThemeName]
     
     if not Data then
-        return false, "Theme not found"
+        return false, "未找到主题"
     end
     
     local ThemeData = CustomThemeData or Data[2]
@@ -706,7 +706,7 @@ function ThemeManager:SaveJSON(): (string, boolean, string?)
 
     local SuccessEncode, EncodedData = pcall(HttpService.JSONEncode, HttpService, ThemeData)
     if not SuccessEncode then
-        return "", false, "Failed to encode data"
+        return "", false, "数据编码失败"
     end
 
     return EncodedData, true
@@ -714,12 +714,12 @@ end
 
 function ThemeManager:LoadJSON(Content: string): (boolean, string?)
     if IsStringEmpty(Content) then
-        return false, "No JSON provided"
+        return false, "未提供 JSON"
     end
 
     local SuccessDecode, Decoded = pcall(HttpService.JSONDecode, HttpService, Content)
     if not SuccessDecode or not IsValidThemeData(Decoded) then
-        return false, "Failed to decode theme data"
+        return false, "解码主题数据失败"
     end
 
     return ThemeManager:ApplyThemeData(Decoded)
@@ -787,7 +787,7 @@ function ThemeManager:CreateThemeManager(Themesbox: any)
     local function RefreshDefaultThemeLabel()
         local DefaultThemeName, _Success, _ErrorMessage = ThemeManager:GetDefaultTheme()
 
-        DefaultThemeLabel:SetText(string.format("Current default theme: %s", DefaultThemeName))
+        DefaultThemeLabel:SetText(string.format("当前默认主题：%s", DefaultThemeName))
         if CustomThemeList then RefreshList() end
     end
 
