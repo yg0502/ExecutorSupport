@@ -603,7 +603,7 @@ function ThemeManager:UpdateContrastWarning()
     else
         ContrastLabel:SetText(string.format(
             "%s 的对比度太低 (%.1f:1)。目标至少达到 %.1f:1，以确保文字可读。",
-            Report.Ratio, Report.PairName, ContrastWarnThreshold
+            Report.PairName, Report.Ratio, ContrastWarnThreshold
         ))
 
         TextLabel.TextColor3 = Library.Scheme.RedColor
