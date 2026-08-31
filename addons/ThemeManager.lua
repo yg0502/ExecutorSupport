@@ -1026,7 +1026,7 @@ function ThemeManager:CreateThemeManager(Themesbox: any)
 
     Themesbox:AddButton("刷新主题列表", RefreshList)
 
-    Themesbox:AddButton("设置为默认主题", function()
+    Themesbox:AddButton("设置默认主题", function()
         local Name = CustomThemeList.Value
         if IsStringEmpty(Name) then
             ThemeManager.Library:Notify("请先选择一个主题")
